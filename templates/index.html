@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         async function downloadVideo() {
             let url = document.getElementById("url").value;
@@ -13,13 +14,13 @@
                 alert("Please enter a YouTube URL.");
                 return;
             }
-            
+
             let response = await fetch("/download", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ url: url, format: format })
             });
-            
+
             let result = await response.json();
             alert(result.message || result.error);
         }
@@ -38,21 +39,31 @@
         setInterval(updateLogs, 1000);
     </script>
 </head>
-<body>
-    <h2>YouTube Downloader</h2>
-    <label for="url">YouTube URL:</label>
-    <input type="text" id="url" placeholder="Enter video URL here">
-    <br><br>
-    <label for="format">Format:</label>
-    <select id="format">
-        <option value="standard">Best Video + Audio</option>
-        <option value="audio_only">Audio Only (MP3)</option>
-    </select>
-    <br><br>
-    <button onclick="downloadVideo()">Download</button>
-    <br><br>
+<body class="bg-gray-900 text-white font-sans">
+    <div class="min-h-screen flex flex-col justify-center items-center">
+        <div class="w-full max-w-2xl bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-center">🎬 YouTube Downloader</h2>
+            
+            <label for="url" class="block text-lg mb-2">YouTube URL:</label>
+            <input type="text" id="url" placeholder="Enter video URL here"
+                class="w-full p-2 text-black rounded-lg border-2 border-gray-600 focus:outline-none focus:border-blue-500">
+            
+            <label for="format" class="block text-lg mt-4">Format:</label>
+            <select id="format"
+                class="w-full p-2 bg-gray-700 rounded-lg border-2 border-gray-600 focus:outline-none focus:border-blue-500">
+                <option value="standard">🎥 Best Video + Audio</option>
+                <option value="audio_only">🎵 Audio Only (MP3)</option>
+            </select>
+            
+            <button onclick="downloadVideo()"
+                class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200">
+                🚀 Download
+            </button>
 
-    <h3>Download Log:</h3>
-    <textarea id="log-output" rows="10" cols="80" readonly></textarea>
+            <h3 class="text-xl font-semibold mt-6">📜 Download Log:</h3>
+            <textarea id="log-output" rows="10" class="w-full mt-2 p-3 text-black rounded-lg border-2 border-gray-600"
+                readonly></textarea>
+        </div>
+    </div>
 </body>
 </html>
