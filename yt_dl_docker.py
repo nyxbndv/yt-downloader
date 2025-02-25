@@ -13,8 +13,8 @@ UMASK = os.getenv("UMASK", "022")
 BASE_DIR = os.path.abspath(".")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 LOG_FILE = os.path.join(BASE_DIR, "logs.txt")
-FFMPEG = os.path.join(BASE_DIR, "ffmpeg")  # Use the locally installed ffmpeg
-YT_DLP = os.path.join(BASE_DIR, "yt-dlp")  # Use the locally installed yt-dlp
+FFMPEG = os.path.join(BASE_DIR, "ffmpeg")
+YT_DLP = os.path.join(BASE_DIR, "yt-dlp")
 
 # Ensure directories exist
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -38,18 +38,11 @@ def download_video(url, format_option):
         "audio_only": [YT_DLP, "-f", "bestaudio", "--extract-audio", "--audio-format", "mp3", "--ffmpeg-location", FFMPEG, "-o", os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"), url],
     }
     
-    if format_option not in commands:
-        write_log("Error: Invalid format option.")
-        return
-    
-    # Clear log file before starting new download
-    open(LOG_FILE, "w").close()
-    
     process = subprocess.Popen(commands[format_option], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
     
     for line in process.stdout:
-        write_log(line.strip())  # Write logs in real-time
-    
+        write_log(line.strip())
+
     process.wait()
     write_log("Download Complete!")
 
@@ -59,29 +52,13 @@ def home():
 
 @app.route('/download', methods=['POST'])
 def download():
-    """Start a download in a background thread."""
     data = request.json
-    url = data.get("url")
-    format_option = data.get("format")
-    
-    if not url:
-        return jsonify({"error": "No URL provided."}), 400
-    
-    threading.Thread(target=download_video, args=(url, format_option), daemon=True).start()
+    threading.Thread(target=download_video, args=(data["url"], data["format"]), daemon=True).start()
     return jsonify({"message": "Download started."})
 
 @app.route('/logs', methods=['GET'])
 def get_logs():
-    """Stream the log file for live updates."""
-    def generate():
-        with open(LOG_FILE, "r") as log_file:
-            while True:
-                line = log_file.readline()
-                if not line:
-                    break
-                yield f"data: {line.strip()}\\n\\n"
-    
-    return Response(generate(), mimetype="text/event-stream")
+    return Response(open(LOG_FILE, "r"), mimetype="text/plain")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
