@@ -21,7 +21,7 @@ A simple web-based **YouTube video & audio downloader** powered by `yt-dlp` and 
 
 ````sh
 git clone https://github.com/irrelevant-bg/yt-downloader.git
-cd YOUR_REPOSITORY
+cd yt-downloader
 ````
 
 
