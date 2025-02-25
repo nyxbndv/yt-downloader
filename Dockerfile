@@ -25,12 +25,15 @@ USER appuser
 
 # Install Python dependencies without root access
 RUN pip install --no-cache-dir --user -r requirements.txt
-RUN pip install --user yt-dlp  
+
+# 🔹 Install yt-dlp manually & ensure it's executable
+RUN wget -O /app/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+    && chmod +x /app/yt-dlp || (echo "ERROR: Failed to install yt-dlp" && exit 1)
 
 # Switch back to root for installing system dependencies
 USER root
 
-# 🔹 Manually Install `ffmpeg` in `/app`
+# 🔹 Ensure ffmpeg is installed correctly in `/app`
 RUN apt-get update && \
     apt-get install -y wget && \
     wget -O /app/ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz && \
@@ -48,6 +51,9 @@ USER appuser
 
 # Expose Flask's default port
 EXPOSE 5000
+
+# Add Unraid Web UI label
+LABEL net.unraid.docker.webui="http://[IP]:5000"
 
 # Run the Flask application
 CMD ["python", "yt_dl_docker.py"]
