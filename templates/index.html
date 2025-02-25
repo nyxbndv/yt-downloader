@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <script>
+        async function downloadVideo() {
+            let url = document.getElementById("url").value;
+            let format = document.getElementById("format").value;
+            
+            if (!url) {
+                alert("Please enter a YouTube URL.");
+                return;
+            }
+            
+            let response = await fetch("/download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: url, format: format })
+            });
+            
+            let result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        function updateLogs() {
+            fetch("/logs")
+                .then(response => response.text())
+                .then(logs => {
+                    let logWindow = document.getElementById("log-output");
+                    logWindow.value = logs;
+                    logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to bottom
+                });
+        }
+
+        // Auto-update logs every second
+        setInterval(updateLogs, 1000);
+    </script>
+</head>
+<body>
+    <h2>YouTube Downloader</h2>
+    <label for="url">YouTube URL:</label>
+    <input type="text" id="url" placeholder="Enter video URL here">
+    <br><br>
+    <label for="format">Format:</label>
+    <select id="format">
+        <option value="standard">Best Video + Audio</option>
+        <option value="audio_only">Audio Only (MP3)</option>
+    </select>
+    <br><br>
+    <button onclick="downloadVideo()">Download</button>
+    <br><br>
+
+    <h3>Download Log:</h3>
+    <textarea id="log-output" rows="10" cols="80" readonly></textarea>
+</body>
+</html>

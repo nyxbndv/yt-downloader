@@ -1,0 +1,7 @@
+__pycache__/
+*.log
+downloads/
+logs.txt
+ffmpeg.tar.xz
+.env
+venv/
