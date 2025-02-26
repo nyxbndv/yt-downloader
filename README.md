@@ -17,22 +17,27 @@ A simple web-based **YouTube video & audio downloader** powered by `yt-dlp` and 
 ## 📦 Installation & Setup
 
 
-### **1️⃣ Clone the Repository**
+### **1️⃣🅰️ Clone the Repository**
 
-````sh
+````
 git clone https://github.com/irrelevant-bg/yt-downloader.git
 cd yt-downloader
+````
+### **1️⃣🅱️ Pull Docker Imagey**
+
+````
+docker pull nyxbndv/yt-downloader
 ````
 
 
 ### 2️⃣ Build the Docker Image
 
-````sh
+````
 docker build -t yt-downloader .
 ````
 
 ### 3️⃣ Run the Docker Container
-```sh
+```
 docker run -d \
   --name yt-downloader \
   -p 5000:5000 \
