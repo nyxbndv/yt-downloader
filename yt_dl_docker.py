@@ -14,7 +14,7 @@ BASE_DIR = os.path.abspath(".")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 LOG_FILE = os.path.join(BASE_DIR, "logs.txt")
 FFMPEG = os.path.join(BASE_DIR, "ffmpeg")
-YT_DLP = os.path.join(BASE_DIR, "yt-dlp")
+YT_DLP = "/app/yt-dlp"
 
 # Ensure directories exist
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -30,21 +30,21 @@ def write_log(message):
         log_file.flush()  # Ensure real-time updates
 
 def download_video(url, format_option):
-    """Handles video downloads and logs output."""
+    """Handles video downloads and logs full yt-dlp output without filtering."""
     write_log(f"Starting download: {url} with format {format_option}")
 
     commands = {
         "standard": [YT_DLP, "-f", "bestvideo+bestaudio", "--ffmpeg-location", FFMPEG, "-o", os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"), url],
         "audio_only": [YT_DLP, "-f", "bestaudio", "--extract-audio", "--audio-format", "mp3", "--ffmpeg-location", FFMPEG, "-o", os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"), url],
     }
-    
+
     process = subprocess.Popen(commands[format_option], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-    
-    for line in process.stdout:
-        write_log(line.strip())
+
+    for line in iter(process.stdout.readline, ''):
+        write_log(line.strip())  # ✅ Log everything, no filtering
 
     process.wait()
-    write_log("Download Complete!")
+    write_log("✅ Download Complete!")
 
 @app.route('/')
 def home():
