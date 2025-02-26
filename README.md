@@ -36,7 +36,7 @@ docker build -t yt-downloader .
 docker run -d \
   --name yt-downloader \
   -p 5000:5000 \
-  -v /mnt/user/YT-Downloads:/app/downloads \
+  -v *LOCATION TO YOUR DOWNLOADS*:/app/downloads \
   -e PUID=1000 -e PGID=100 -e UMASK=022 \
   yt-downloader
 ```
