@@ -8,9 +8,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y wget curl
 
 # 🔹 Install yt-dlp into /app
-RUN wget -O /app/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /app/yt-dlp \
     && chmod +x /app/yt-dlp \
-    && ls -l /app/yt-dlp
+    && ls -l /app/yt-dlp \
+    && /app/yt-dlp --version
 
 # 🔹 Install FFmpeg from a New Reliable Source
 RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /app/ffmpeg.tar.xz \
