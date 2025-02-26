@@ -14,6 +14,26 @@ A simple web-based **YouTube video & audio downloader** powered by `yt-dlp` and 
 
 ---
 
+## Docker Compose
+
+````
+version: '3.8'
+
+services:
+  yt-downloader:
+    container_name: yt-downloader
+    image: nyxbndv/yt-downloader:latest
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - /home/yt-downloader:/app/downloads
+    environment:
+      - PUID=1000
+      - PGID=100
+      - UMASK=022
+````
+
 ## 📦 Installation & Setup
 
 
@@ -23,7 +43,7 @@ A simple web-based **YouTube video & audio downloader** powered by `yt-dlp` and 
 git clone https://github.com/irrelevant-bg/yt-downloader.git
 cd yt-downloader
 ````
-### **1️⃣🅱️ Pull Docker Imagey**
+### **1️⃣🅱️ Pull Docker Image**
 
 ````
 docker pull nyxbndv/yt-downloader
