@@ -27,7 +27,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /home/yt-downloader:/app/downloads
+      - /your/downloads/directory:/app/downloads
     environment:
       - PUID=1000
       - PGID=100
@@ -37,18 +37,12 @@ services:
 ## 📦 Installation & Setup
 
 
-### **1️⃣🅰️ Clone the Repository**
+### **1️⃣ Clone the Repository**
 
 ````
 git clone https://github.com/irrelevant-bg/yt-downloader.git
 cd yt-downloader
 ````
-### **1️⃣🅱️ Pull Docker Image**
-
-````
-docker pull nyxbndv/yt-downloader
-````
-
 
 ### 2️⃣ Build the Docker Image
 
