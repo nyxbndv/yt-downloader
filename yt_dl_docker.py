@@ -6,9 +6,9 @@ import threading
 app = Flask(__name__)
 
 # Environment variables for permissions
-PUID = os.getenv("PUID", "1000")
-PGID = os.getenv("PGID", "100")
-UMASK = os.getenv("UMASK", "022")
+PUID = int(os.getenv("PUID", "1000"))
+PGID = int(os.getenv("PGID", "100"))
+UMASK = int(os.getenv("UMASK", "0o022"), 8)
 
 BASE_DIR = os.path.abspath(".")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
@@ -22,6 +22,11 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 # Ensure logs.txt exists
 if not os.path.exists(LOG_FILE):
     open(LOG_FILE, "w").close()
+
+# Set ownership and permissions
+os.chown(DOWNLOAD_DIR, PUID, PGID)
+os.chown(LOG_FILE, PUID, PGID)
+os.umask(UMASK)
 
 def write_log(message):
     """Writes a message to the log file and flushes it immediately."""
@@ -41,7 +46,7 @@ def download_video(url, format_option):
     process = subprocess.Popen(commands[format_option], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 
     for line in iter(process.stdout.readline, ''):
-        write_log(line.strip())  # ✅ Log everything, no filtering
+        write_log(line.strip())  # Log everything, no filtering
 
     process.wait()
     write_log("✅ Download Complete!")
