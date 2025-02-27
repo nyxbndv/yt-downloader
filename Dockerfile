@@ -14,8 +14,17 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o 
     && ls -l /app/yt-dlp \
     && file /app/yt-dlp
 
+# 🔹 Install FFmpeg from the official FFmpeg static builds (Linux x86_64)
+RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /app/ffmpeg.tar.xz \
+    && tar -xvf /app/ffmpeg.tar.xz -C /app --strip-components=1 \
+    && rm /app/ffmpeg.tar.xz \
+    && chmod +x /app/ffmpeg
+
 # Verify yt-dlp installation
 RUN /app/yt-dlp --version || (echo "ERROR: yt-dlp failed to install!" && exit 1)
+
+# Verify FFmpeg installation
+RUN /app/ffmpeg -version || (echo "ERROR: FFmpeg failed to install!" && exit 1)
 
 # Create a non-root user (appuser)
 RUN useradd -m appuser
