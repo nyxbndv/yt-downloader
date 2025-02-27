@@ -1,5 +1,5 @@
 # Use an official lightweight Python image
-FROM python:3.11-slim
+FROM python:3.11
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -7,15 +7,16 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y wget curl
 
-# Install yt-dlp into /usr/local/bin
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
-    && chmod +x /usr/local/bin/yt-dlp \
-    && yt-dlp --version
+# Install yt-dlp into /app
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /app/yt-dlp \
+    && chmod +x /app/yt-dlp \
+    && /app/yt-dlp --version
 
-# Install FFmpeg from a reliable source (GitHub static builds)
-RUN curl -L https://github.com/eugeneware/ffmpeg-static/releases/latest/download/linux-x64 -o /usr/local/bin/ffmpeg \
-    && chmod +x /usr/local/bin/ffmpeg \
-    && /usr/local/bin/ffmpeg -version
+# Install FFmpeg from a reliable source
+RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /app/ffmpeg.tar.xz \
+    && tar -xvf /app/ffmpeg.tar.xz -C /app --strip-components=1 \
+    && rm /app/ffmpeg.tar.xz \
+    && chmod +x /app/ffmpeg
 
 # Create a non-root user (appuser)
 RUN useradd -m appuser
