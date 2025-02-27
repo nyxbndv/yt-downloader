@@ -23,19 +23,23 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 if not os.path.exists(LOG_FILE):
     open(LOG_FILE, "w").close()
 
-# Set ownership and permissions
-os.chown(DOWNLOAD_DIR, PUID, PGID)
-os.chown(LOG_FILE, PUID, PGID)
+# Attempt to set ownership and permissions, but don't fail if not allowed
+try:
+    os.chown(DOWNLOAD_DIR, PUID, PGID)
+    os.chown(LOG_FILE, PUID, PGID)
+except PermissionError:
+    print("Warning: Could not change ownership of directories. Running with default permissions.")
+
 os.umask(UMASK)
 
 def write_log(message):
     """Writes a message to the log file and flushes it immediately."""
     with open(LOG_FILE, "a") as log_file:
         log_file.write(message + "\n")
-        log_file.flush()  # Ensure real-time updates
+        log_file.flush()
 
 def download_video(url, format_option):
-    """Handles video downloads and logs full yt-dlp output without filtering."""
+    """Handles video downloads and logs full yt-dlp output."""
     write_log(f"Starting download: {url} with format {format_option}")
 
     commands = {
@@ -46,7 +50,7 @@ def download_video(url, format_option):
     process = subprocess.Popen(commands[format_option], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 
     for line in iter(process.stdout.readline, ''):
-        write_log(line.strip())  # Log everything, no filtering
+        write_log(line.strip())
 
     process.wait()
     write_log("✅ Download Complete!")
