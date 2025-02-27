@@ -1,63 +1,41 @@
 # Use an official lightweight Python image
-FROM python:3.11
+FROM python:3.11-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y wget curl
+RUN apt-get update && apt-get install -y wget curl && rm -rf /var/lib/apt/lists/*
 
-# 🔹 Install yt-dlp into /app
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /app/yt-dlp \
-    && chmod +x /app/yt-dlp \
-    && ls -l /app/yt-dlp \
-    && /app/yt-dlp --version
+# Install yt-dlp into /app
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && chmod +x /usr/local/bin/yt-dlp \
+    && yt-dlp --version
 
-# 🔹 Install FFmpeg from a New Reliable Source
-RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /app/ffmpeg.tar.xz \
-    && tar -xvf /app/ffmpeg.tar.xz -C /app --strip-components=1 \
-    && rm /app/ffmpeg.tar.xz \
-    && chmod +x /app/ffmpeg
-
-# Verify yt-dlp installation
-RUN /app/yt-dlp --version || (echo "ERROR: yt-dlp failed to install!" && exit 1)
+# Install FFmpeg from a reliable source
+RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /tmp/ffmpeg.tar.xz \
+    && tar -xvf /tmp/ffmpeg.tar.xz -C /usr/local/bin --strip-components=1 --wildcards '*/ffmpeg' \
+    && rm /tmp/ffmpeg.tar.xz \
+    && chmod +x /usr/local/bin/ffmpeg \
+    && ffmpeg -version
 
 # Create a non-root user (appuser)
 RUN useradd -m appuser
 
-# Copy application files before setting ownership
+# Copy application files
 COPY . /app
 
 # Ensure logs.txt and downloads directory exist, then set ownership & permissions
-RUN touch /app/logs.txt && \
-    mkdir -p /app/downloads && \
-    chown -R appuser:appuser /app && \
-    chmod 664 /app/logs.txt && \
-    chmod 775 /app/downloads
+RUN touch /app/logs.txt \
+    && mkdir -p /app/downloads \
+    && chown -R appuser:appuser /app \
+    && chmod -R 755 /app
 
-# Set PATH so yt-dlp and ffmpeg can be found in /app
-ENV PATH="/app:$PATH"
-
-# Switch to non-root user before installing dependencies
+# Switch to non-root user
 USER appuser
 
-# Install Python dependencies without root access
-RUN pip install --no-cache-dir --user -r requirements.txt
-
-# Switch back to root for installing system dependencies
-USER root
-
-# Ensure `appuser` retains correct ownership after installations
-RUN chown -R appuser:appuser /app
-
-# Switch back to appuser before running the application
-USER appuser
-
-# Expose Flask's default port
+# Expose the port the app runs on
 EXPOSE 5000
 
-# Add Unraid Web UI label
-LABEL net.unraid.docker.webui="http://[IP]:5000"
-
-# Run the Flask application
+# Run the application
 CMD ["python", "yt_dl_docker.py"]
