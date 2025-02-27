@@ -6,15 +6,15 @@ import threading
 app = Flask(__name__)
 
 # Environment variables for permissions
-PUID = int(os.getenv("PUID", "1000"))
-PGID = int(os.getenv("PGID", "100"))
-UMASK = int(os.getenv("UMASK", "0o022"), 8)
+PUID = os.getenv("PUID", "1000")
+PGID = os.getenv("PGID", "100")
+UMASK = os.getenv("UMASK", "022")
 
 BASE_DIR = os.path.abspath(".")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 LOG_FILE = os.path.join(BASE_DIR, "logs.txt")
-FFMPEG = "/usr/local/bin/ffmpeg"
-YT_DLP = "/usr/local/bin/yt-dlp"
+FFMPEG = os.path.join(BASE_DIR, "ffmpeg")
+YT_DLP = os.path.join(BASE_DIR, "yt-dlp")
 
 # Ensure directories exist
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -23,37 +23,28 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 if not os.path.exists(LOG_FILE):
     open(LOG_FILE, "w").close()
 
-# Attempt to set ownership and permissions, but don't fail if not allowed
-try:
-    os.chown(DOWNLOAD_DIR, PUID, PGID)
-    os.chown(LOG_FILE, PUID, PGID)
-except PermissionError:
-    print("Warning: Could not change ownership of directories. Running with default permissions.")
-
-os.umask(UMASK)
-
 def write_log(message):
     """Writes a message to the log file and flushes it immediately."""
     with open(LOG_FILE, "a") as log_file:
         log_file.write(message + "\n")
-        log_file.flush()
+        log_file.flush()  # Ensure real-time updates
 
 def download_video(url, format_option):
-    """Handles video downloads and logs full yt-dlp output."""
+    """Handles video downloads and logs output."""
     write_log(f"Starting download: {url} with format {format_option}")
 
     commands = {
         "standard": [YT_DLP, "-f", "bestvideo+bestaudio", "--ffmpeg-location", FFMPEG, "-o", os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"), url],
         "audio_only": [YT_DLP, "-f", "bestaudio", "--extract-audio", "--audio-format", "mp3", "--ffmpeg-location", FFMPEG, "-o", os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"), url],
     }
-
+    
     process = subprocess.Popen(commands[format_option], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-
-    for line in iter(process.stdout.readline, ''):
+    
+    for line in process.stdout:
         write_log(line.strip())
 
     process.wait()
-    write_log("✅ Download Complete!")
+    write_log("Download Complete!")
 
 @app.route('/')
 def home():
