@@ -8,9 +8,9 @@ A simple web-based **YouTube video & audio downloader** powered by `yt-dlp` and 
 ✔ **Download YouTube videos** in high quality (`bestvideo+bestaudio`)  
 ✔ **Extract audio** as MP3 (`bestaudio`)  
 ✔ **Dockerized** for easy setup on **Unraid, Linux, Windows, or macOS**  
-✔ **FFmpeg support** for video/audio merging  
-✔ **Web UI** for easy usage  
-✔ **Real-time logs** for download progress  
+✔ **FFmpeg support**
+✔ **Web UI**
+✔ **Real-time logs**
 
 ---
 
