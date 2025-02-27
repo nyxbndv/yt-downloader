@@ -25,10 +25,10 @@ RUN useradd -m appuser
 COPY . /app
 
 # Ensure logs.txt and downloads directory exist, then set ownership & permissions
-RUN touch /app/logs.txt \
-    && mkdir -p /app/downloads \
-    && chown -R appuser:appuser /app \
-    && chmod -R 755 /app
+#RUN touch /app/logs.txt \
+#    && mkdir -p /app/downloads \
+#    && chown -R appuser:appuser /app \
+#    && chmod -R 755 /app
 
 # Switch to non-root user
 USER appuser
