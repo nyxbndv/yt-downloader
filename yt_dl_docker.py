@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, Response # type: ignore
+from flask import Flask, request, jsonify, render_template, Response
 import subprocess
 import os
 import threading
@@ -13,8 +13,8 @@ UMASK = int(os.getenv("UMASK", "0o022"), 8)
 BASE_DIR = os.path.abspath(".")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 LOG_FILE = os.path.join(BASE_DIR, "logs.txt")
-FFMPEG = os.path.join(BASE_DIR, "ffmpeg")
-YT_DLP = "/app/yt-dlp"
+FFMPEG = "/usr/local/bin/ffmpeg"
+YT_DLP = "/usr/local/bin/yt-dlp"
 
 # Ensure directories exist
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
