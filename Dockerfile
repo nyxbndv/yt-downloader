@@ -5,19 +5,17 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y wget curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y wget curl
 
-# Install yt-dlp into /app
+# Install yt-dlp into /usr/local/bin
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
     && chmod +x /usr/local/bin/yt-dlp \
     && yt-dlp --version
 
-# Install FFmpeg from a reliable source
-RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /tmp/ffmpeg.tar.xz \
-    && tar -xvf /tmp/ffmpeg.tar.xz -C /usr/local/bin --strip-components=1 --wildcards '*/ffmpeg' \
-    && rm /tmp/ffmpeg.tar.xz \
+# Install FFmpeg from a reliable source (GitHub static builds)
+RUN curl -L https://github.com/eugeneware/ffmpeg-static/releases/latest/download/linux-x64 -o /usr/local/bin/ffmpeg \
     && chmod +x /usr/local/bin/ffmpeg \
-    && ffmpeg -version
+    && /usr/local/bin/ffmpeg -version
 
 # Create a non-root user (appuser)
 RUN useradd -m appuser
