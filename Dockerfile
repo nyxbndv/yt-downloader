@@ -36,5 +36,7 @@ USER appuser
 # Expose the port the app runs on
 EXPOSE 5000
 
+RUN pip install --no-cache-dir --user -r requirements.txt
+
 # Run the application
 CMD ["python", "yt_dl_docker.py"]
